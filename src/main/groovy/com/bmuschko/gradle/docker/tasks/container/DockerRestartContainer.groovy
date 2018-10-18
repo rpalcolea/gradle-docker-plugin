@@ -15,6 +15,7 @@
  */
 package com.bmuschko.gradle.docker.tasks.container
 
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 
@@ -24,15 +25,16 @@ class DockerRestartContainer extends DockerExistingContainer {
      */
     @Input
     @Optional
-    Integer timeout
+    Property<Integer> timeout
 
     @Override
     void runRemoteCommand(dockerClient) {
         logger.quiet "Restarting container with ID '${getContainerId()}'."
         def restartContainerCmd = dockerClient.restartContainerCmd(getContainerId())
 
-        if(getTimeout()) {
-            restartContainerCmd.withtTimeout(getTimeout())
+        def duration = getTimeout().getOrNull()
+        if(duration) {
+            restartContainerCmd.withtTimeout(duration)
         }
 
         restartContainerCmd.exec()

@@ -17,6 +17,7 @@ package com.bmuschko.gradle.docker.tasks.container.extras
 
 import com.bmuschko.gradle.docker.tasks.container.DockerExistingContainer
 import org.gradle.api.GradleException
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 
@@ -27,7 +28,7 @@ class DockerWaitHealthyContainer extends DockerExistingContainer {
      */
     @Input
     @Optional
-    Integer timeout
+    Property<Integer> timeout
 
     /**
      * Interval between each check in milliseconds.
@@ -41,6 +42,7 @@ class DockerWaitHealthyContainer extends DockerExistingContainer {
         logger.quiet "Waiting for container with ID '${getContainerId()}' to be healthy."
 
         def command = dockerClient.inspectContainerCmd(getContainerId())
+        int timeout = timeout.getOrNull()
         Long deadline = timeout ? System.currentTimeMillis() + timeout * 1000 : null
         long sleepInterval = checkInterval ?: 500
 
